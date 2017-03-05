@@ -1,19 +1,22 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const handlebars = require('express-handlebars');
+const cache = require('./cache');
 const redis = require('redis');
-
+let client = redis.createClient();
 const { slow } = require('./routes');
-
 const app = express();
 const PORT = 8080;
 
-app.engine('.hbs', handlebars({extname: '.hbs', defaultLayout: 'main'}));
+app.engine('.hbs', handlebars({
+  extname: '.hbs',
+  defaultLayout: 'main'
+}));
 app.set('view engine', '.hbs');
 
 app.use(bodyParser.json());
 // server.use(creamCache.init()); /* student implements this */
-app.use('/slow', slow);
+app.use('/slow', cache, slow);
 
 app.get('/', (req, res) => {
   res.render('index');
